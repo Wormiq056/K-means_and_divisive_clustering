@@ -19,9 +19,8 @@ class KMeans:
 
     def _assign_points_to_init_clusters(self, init_clusters):
         init_dict = {tuple(cluster): [] for cluster in init_clusters}
-        copied_clusters = self.clusters.copy()
 
-        for cluster in copied_clusters:
+        for cluster in self.clusters:
             distances = [distance(cluster, init_cluster) for init_cluster in init_clusters]
             min_index = distances.index(min(distances))
             init_dict[tuple(init_clusters[min_index])].append(cluster)
