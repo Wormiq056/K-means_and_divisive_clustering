@@ -24,7 +24,7 @@ def main() -> None:
         print("Argument -k must be a number")
         return
     if int(args['clusters']) < 1 or int(args['clusters']) > NUM_OF_POINTS:
-        print(f"Agurment -k must be 0<k>{NUM_OF_POINTS}")
+        print(f"Argument -k must be 0<k>{NUM_OF_POINTS}")
         return
 
     created_points = Generator().generate_points()

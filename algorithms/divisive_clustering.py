@@ -4,7 +4,7 @@ from typing import List
 
 import matplotlib.pyplot as plot
 
-from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS
+from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS, COLORS
 from helpers.measurements import get_dist_calculator, distance
 
 
@@ -86,6 +86,19 @@ class DivisiveClustering:
         max_variance_index = variances.index(max(variances))
         return self.final_clusters[max_variance_index]
 
+    def _statistics(self, best_variance):
+        good_clusters = 0
+        for cluster in best_variance:
+            center = self.center_calculation(cluster)
+            sum_of_distances = 0
+            for points in cluster:
+                sum_of_distances += distance(points, center)
+            if sum_of_distances / len(cluster) <= 500:
+                good_clusters += 1
+        cluster_success_rate = good_clusters / len(best_variance) * 100
+        print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
+        print(f"Cluster success rate {cluster_success_rate} %")
+
     def run(self):
         for i in range(DIVISIVE_ITERATIONS):
             self.current_num_of_clusters = 1
@@ -107,7 +120,13 @@ class DivisiveClustering:
 
         best_variance = self._select_best_variance()
         self.stop_time = timeit.default_timer()
-        
+
+        self._statistics(best_variance)
+
+        color_counter = 0
         for values in best_variance:
-            plot.scatter([x[0] for x in values], [x[1] for x in values])
+            if color_counter == len(COLORS):
+                color_counter = 0
+            plot.scatter([x[0] for x in values], [x[1] for x in values], color=COLORS[color_counter])
+            color_counter += 1
         plot.show()
