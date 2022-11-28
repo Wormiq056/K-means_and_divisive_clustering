@@ -1,8 +1,11 @@
-from typing import List
-from helpers.measurements import get_dist_calculator, distance
-from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS
 import random as rd
+from typing import List
+
 import matplotlib.pyplot as plot
+
+from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS
+from helpers.measurements import get_dist_calculator, distance
+
 
 class DivisiveClustering:
     final_clusters = []
@@ -14,10 +17,12 @@ class DivisiveClustering:
         rd.seed(RANDOM_SEED)
         self.current_num_of_clusters = 1
 
-    def _choose_2_points_as_clusters(self, cluster: List[List[int]]):
+    @staticmethod
+    def _choose_2_points_as_clusters(cluster: List[List[int]]):
         return rd.sample(cluster, 2)
 
-    def _assign_points_to_clusters(self, points, cluster):
+    @staticmethod
+    def _assign_points_to_clusters(points, cluster):
         cluster_dict = {tuple(point): [] for point in points}
         for value in cluster:
             distance_a = distance(points[0], value)
@@ -34,7 +39,8 @@ class DivisiveClustering:
             center_points.append(self.center_calculation(values))
         return center_points
 
-    def _reassign_points_to_center(self, clusters, centers):
+    @staticmethod
+    def _reassign_points_to_center(clusters, centers):
         center_dict = {center: [] for center in centers}
         for cluster in clusters:
             distances = [distance(cluster, center) for center in centers]
@@ -48,7 +54,7 @@ class DivisiveClustering:
         chosen_points = self._choose_2_points_as_clusters(cluster)
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         recalculated_center_points = self._calculate_new_center_points(assigned_points)
-        reassigned_points = self._reassign_points_to_center(cluster,recalculated_center_points)
+        reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
         self.current_num_of_clusters += 1
         return reassigned_points.values()
 
@@ -67,19 +73,14 @@ class DivisiveClustering:
 
     def _select_best_variance(self):
         variances = []
+        total_length = len(self.clusters[0])
         for final_cluster in self.final_clusters:
-            variance = 0
-            keys = [key for key in final_cluster.keys()]
-            i = 0
-            for values in final_cluster.values():
-                distance_from_middle = 0
-                for value in values:
-                    distance_from_middle += distance(value, keys[i])
-                variance += distance_from_middle / len(values)
-                i += 1
+            variance = 1
+            for values in final_cluster:
+                variance = variance * (len(values) / total_length)
             variances.append(variance)
-        min_variance_index = variances.index(min(variances))
-        return self.final_clusters[min_variance_index]
+        max_variance_index = variances.index(max(variances))
+        return self.final_clusters[max_variance_index]
 
     def run(self):
         for i in range(DIVISIVE_ITERATIONS):
@@ -97,13 +98,10 @@ class DivisiveClustering:
                         self.current_num_of_clusters += 1
                         break
                     for created_cluster in created_clusters:
-                            new_clusters.append(created_cluster)
+                        new_clusters.append(created_cluster)
                 current_clusters = new_clusters
 
-        counter = 1
-        for variance in self.final_clusters:
-            for values in variance:
-                plot.scatter([x[0] for x in values],[x[1] for x in values])
-            plot.text(0,0, counter)
-            plot.show()
-            counter += 1
+        best_variance = self._select_best_variance()
+        for values in best_variance:
+            plot.scatter([x[0] for x in values], [x[1] for x in values])
+        plot.show()

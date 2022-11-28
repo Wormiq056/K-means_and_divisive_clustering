@@ -46,19 +46,14 @@ class KMeans:
 
     def _select_best_variance(self):
         variances = []
+        total_length = len(self.clusters)
         for final_cluster in self.final_clusters:
-            variance = 0
-            keys = [key for key in final_cluster.keys()]
-            i = 0
+            variance = 1
             for values in final_cluster.values():
-                distance_from_middle = 0
-                for value in values:
-                    distance_from_middle += distance(value, keys[i])
-                variance += distance_from_middle / len(values)
-                i += 1
+                variance = variance * (len(values) / total_length)
             variances.append(variance)
-        min_variance_index = variances.index(min(variances))
-        return self.final_clusters[min_variance_index]
+        max_variance_index = variances.index(max(variances))
+        return self.final_clusters[max_variance_index]
 
     def run(self):
         for i in range(K_MEANS_ITERATIONS):
@@ -68,13 +63,6 @@ class KMeans:
             recalculated_clusters = self._assign_points_to_recalculated_centers(calculated_center_points)
             self.final_clusters.append(recalculated_clusters)
 
-        # counter = 1
-        # for variance in self.final_clusters:
-        #     for values in variance.values():
-        #         plot.scatter([x[0] for x in values],[x[1] for x in values])
-        #     plot.text(0,0, counter)
-        #     plot.show()
-        #     counter += 1
         best_variance = self._select_best_variance()
         for values in best_variance.values():
             plot.scatter([x[0] for x in values], [x[1] for x in values])
