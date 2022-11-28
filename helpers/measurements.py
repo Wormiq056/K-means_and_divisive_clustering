@@ -25,7 +25,8 @@ def centroid_calculation(cluster: List[List[int]]) -> tuple[int, int]:
 def medoid_calculation(cluster: List[List[int]]) -> tuple[int, int]:
     centroid = np.mean(cluster)
     medoid = cluster[np.argmin([sum((x - centroid) ** 2) for x in cluster])]
-    return medoid[0] , medoid[1]
+    return medoid[0], medoid[1]
+
 
 def get_dist_calculator(algorithm: str):
     if algorithm == "c" or algorithm == "d":

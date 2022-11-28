@@ -1,7 +1,7 @@
 import random as rd
 from typing import List
 
-from consts import RANDOM_SEED, COORDINATES_START, COORDINATES_END, OFFSET_START, OFFSET_END, NUM_OF_POINTS
+from helpers.consts import RANDOM_SEED, COORDINATES_START, COORDINATES_END, OFFSET_START, OFFSET_END, NUM_OF_POINTS
 
 
 class Generator:

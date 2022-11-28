@@ -1,9 +1,11 @@
-from consts import RANDOM_SEED, K_MEANS_ITERATIONS
-from typing import List
 import random as rd
-from measurements import distance, get_dist_calculator
-import numpy as np
+from typing import List
+
 from matplotlib import pyplot as plot
+
+from helpers.consts import RANDOM_SEED, K_MEANS_ITERATIONS
+from helpers.measurements import distance, get_dist_calculator
+
 
 class KMeans:
     final_clusters = []
@@ -52,8 +54,8 @@ class KMeans:
             for values in final_cluster.values():
                 distance_from_middle = 0
                 for value in values:
-                    distance_from_middle += distance(value,keys[i])
-                variance += distance_from_middle/len(values)
+                    distance_from_middle += distance(value, keys[i])
+                variance += distance_from_middle / len(values)
                 i += 1
             variances.append(variance)
         min_variance_index = variances.index(min(variances))

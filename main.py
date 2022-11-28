@@ -1,6 +1,7 @@
 import argparse
-from k_means import KMeans
-from generator import Generator
+
+from helpers.generator import Generator
+from algorithms.k_means import KMeans
 
 
 def main() -> None:
@@ -11,7 +12,7 @@ def main() -> None:
     args = vars(ap.parse_args())
 
     created_points = Generator().generate_points()
-    if args['algorithm'] == 'c' or args['algorithm'] =='m':
+    if args['algorithm'] == 'c' or args['algorithm'] == 'm':
         KMeans(created_points, int(args["clusters"]), args["algorithm"]).run()
 
 
