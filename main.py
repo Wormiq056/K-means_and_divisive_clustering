@@ -7,6 +7,9 @@ from helpers.generator import Generator
 
 
 def main() -> None:
+    """
+    main function that checks if arguments are valid and runs the program
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("-a", "--algorithm", required=True,
                     help="which algorithm to use (centroid k-means = c, medoid k-means = m, divisive = d)")

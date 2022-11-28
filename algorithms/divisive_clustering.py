@@ -1,3 +1,4 @@
+import timeit
 import random as rd
 from typing import List
 
@@ -9,8 +10,11 @@ from helpers.measurements import get_dist_calculator, distance
 
 class DivisiveClustering:
     final_clusters = []
+    start_time: float
+    stop_time: float
 
     def __init__(self, created_points: List[List[int]], num_of_clusters: int, center_calculation: str) -> None:
+        self.start_time = timeit.default_timer()
         self.clusters = [created_points]
         self.k = num_of_clusters
         self.center_calculation = get_dist_calculator(center_calculation)
@@ -102,6 +106,8 @@ class DivisiveClustering:
                 current_clusters = new_clusters
 
         best_variance = self._select_best_variance()
+        self.stop_time = timeit.default_timer()
+        
         for values in best_variance:
             plot.scatter([x[0] for x in values], [x[1] for x in values])
         plot.show()

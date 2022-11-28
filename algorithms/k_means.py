@@ -1,3 +1,4 @@
+import timeit
 import random as rd
 from typing import List
 
@@ -9,8 +10,11 @@ from helpers.measurements import distance, get_dist_calculator
 
 class KMeans:
     final_clusters = []
+    start_time: float
+    stop_time: float
 
     def __init__(self, clusters: List[List[int]], num_of_clusters: int, cluster_center: str):
+        self.start_time = timeit.default_timer()
         self.clusters = clusters
         self.cluster_center = cluster_center
         self.k = num_of_clusters
@@ -64,6 +68,8 @@ class KMeans:
             self.final_clusters.append(recalculated_clusters)
 
         best_variance = self._select_best_variance()
+        self.stop_time = timeit.default_timer()
+
         for values in best_variance.values():
             plot.scatter([x[0] for x in values], [x[1] for x in values])
         plot.show()
