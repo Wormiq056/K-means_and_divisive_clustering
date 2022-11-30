@@ -6,7 +6,7 @@ from helpers.consts import RANDOM_SEED, COORDINATES_START, COORDINATES_END, OFFS
 
 class Generator:
     """
-    class that generates random unique points
+    class that generates random unique points for clustering algorithms
     """
     coordinates_created = {}
     created_clusters = []
@@ -17,7 +17,7 @@ class Generator:
 
     def _generate_first_20(self) -> None:
         """
-        method that generated first random 20 points
+        method that generated first random unique 20 points
         """
         while len(self.created_clusters) != 20:
             x = rd.randint(COORDINATES_START, COORDINATES_END)
@@ -28,9 +28,8 @@ class Generator:
 
     def _generate_rest(self) -> None:
         """
-        method that creates rest of the unique points based on offset from randomly selected point
+        method that creates rest of the unique points based on offset from randomly selected already created points
         """
-
         while len(self.created_clusters) != NUM_OF_POINTS:
             random_cluster = rd.choice(self.created_clusters)
             offset_x = rd.randint(OFFSET_START, OFFSET_END)

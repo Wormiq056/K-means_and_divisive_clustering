@@ -1,3 +1,6 @@
+"""
+file that stores all needed constants for my program
+"""
 RANDOM_SEED = "2515546116454"
 COORDINATES_START = -5000
 COORDINATES_END = 5000
