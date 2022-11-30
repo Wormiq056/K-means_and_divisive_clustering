@@ -24,7 +24,7 @@ class KMeans:
         self.clusters = clusters
         self.cluster_center = cluster_center
         self.k = num_of_clusters
-        rd.seed(RANDOM_SEED)
+        rd.seed(RANDOM_SEED)  # setting random seed fo reproducibility
         self.center_calculator = get_dist_calculator(cluster_center)
 
     def _assign_points_to_init_clusters(self, init_clusters: List[List[int]]) -> dict:

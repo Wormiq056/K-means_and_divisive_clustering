@@ -9,24 +9,44 @@ from helpers.measurements import get_dist_calculator, distance
 
 
 class DivisiveClustering:
+    """
+    class that implements divisive reverse k-means algorithm. It follows the top down approach and every iteration it
+    splits current clusters into two by implementing k-means logic. Meaning recursively we call method that selects 2
+    random points from cluster and assigns closest points to them. We do this until we reach out wanted number of k
+    clusters
+    """
     final_clusters = []
     start_time: float
     stop_time: float
 
     def __init__(self, created_points: List[List[int]], num_of_clusters: int, center_calculation: str) -> None:
+        """
+        init method that also gets center_calculation even though i set divisive to only have centroid calculation
+        """
         self.start_time = timeit.default_timer()
         self.clusters = [created_points]
         self.k = num_of_clusters
         self.center_calculation = get_dist_calculator(center_calculation)
-        rd.seed(RANDOM_SEED)
+        rd.seed(RANDOM_SEED)  # setting seed for random for reproducibility
         self.current_num_of_clusters = 1
 
     @staticmethod
-    def _choose_2_points_as_clusters(cluster: List[List[int]]):
+    def _choose_2_points_as_clusters(cluster: List[List[int]]) -> List[List[int]]:
+        """
+        static method that returns 2 randomly selected points from given cluster
+        :param cluster: from which we want to select random points
+        :return: selected points
+        """
         return rd.sample(cluster, 2)
 
     @staticmethod
-    def _assign_points_to_clusters(points, cluster):
+    def _assign_points_to_clusters(points: List[List[int]], cluster: List[List[int]]) -> dict:
+        """
+        static method that assigned points from clusters to the closest center point that was selected
+        :param points: selected center points of clusters
+        :param cluster: from which we want to assign points to
+        :return: dict with assigned points
+        """
         cluster_dict = {tuple(point): [] for point in points}
         for value in cluster:
             distance_a = distance(points[0], value)
@@ -37,22 +57,39 @@ class DivisiveClustering:
                 cluster_dict[tuple(points[1])].append(value)
         return cluster_dict
 
-    def _calculate_new_center_points(self, clusters):
+    def _calculate_new_center_points(self, clusters: dict) -> List[List[int]]:
+        """
+        method that calculates new center points from given clusters
+        :param clusters: for which we want to calculate new center points
+        :return: recalculated center points
+        """
         center_points = []
         for values in clusters.values():
             center_points.append(self.center_calculation(values))
         return center_points
 
     @staticmethod
-    def _reassign_points_to_center(clusters, centers):
+    def _reassign_points_to_center(cluster: List[List[int]], centers: List[List[int]]) -> dict:
+        """
+        method that reassigns points from already assigned clusters to new recalculated centers
+        :param cluster: with assigned points
+        :param centers: newly calculated centers
+        :return: dict with reassigned points
+        """
         center_dict = {center: [] for center in centers}
-        for cluster in clusters:
-            distances = [distance(cluster, center) for center in centers]
+        for point in cluster:
+            distances = [distance(point, center) for center in centers]
             min_index = distances.index(min(distances))
-            center_dict[tuple(centers[min_index])].append(cluster)
+            center_dict[tuple(centers[min_index])].append(point)
         return center_dict
 
-    def _top_down_k_means(self, cluster):
+    def _top_down_k_means(self, cluster: List[List[int]]) -> List[List[int]] or None:
+        """
+        method that implements top down k-means meaning it selects 2 random points from given cluster and continues
+        k- means algorithm like when we want to have 2 final clusters
+        :param cluster: cluster we want to split
+        :return: list of 2 new clusters
+        """
         if self.current_num_of_clusters == self.k:
             return
         chosen_points = self._choose_2_points_as_clusters(cluster)
@@ -62,7 +99,14 @@ class DivisiveClustering:
         self.current_num_of_clusters += 1
         return reassigned_points.values()
 
-    def _handle_odd_k(self, clusters):
+    def _handle_odd_k(self, clusters: List[List[List[int]]]) -> None:
+        """
+        method that is called when wa want to have odd number of k clusters
+        it selects from current created cluster the one that has the biggest amount of values in it and splits them
+        into 2 following k-means reverse algorithm
+        at the end it stores created odd k clusters
+        :param clusters: so far generated clusters
+        """
         cluster_lengths = [len(cluster) for cluster in clusters]
         index = cluster_lengths.index(max(cluster_lengths))
         chosen_points = self._choose_2_points_as_clusters(clusters[index])
@@ -75,7 +119,13 @@ class DivisiveClustering:
             final_clusters.append(cluster)
         self.final_clusters.append(final_clusters)
 
-    def _select_best_variance(self):
+    def _select_best_variance(self) -> List[List[List[int]]]:
+        """
+        method that selects best variance out of generated clusters, we repeat the whole k-means process n times (in my
+        case 5 times) and then based on variance we select the best one. Best variance means that generated k clusters
+        have the most evenly split number of points in all clusters
+        :return: k clusters with the best variance
+        """
         variances = []
         total_length = len(self.clusters[0])
         for final_cluster in self.final_clusters:
@@ -86,7 +136,13 @@ class DivisiveClustering:
         max_variance_index = variances.index(max(variances))
         return self.final_clusters[max_variance_index]
 
-    def _statistics(self, best_variance):
+    def _statistics(self, best_variance: List[List[List[int]]]) -> None:
+        """
+        method that outputs statistics for generated outcome, how much time it took to generate n k-means algorithms and
+        select the best one. Also outputs selected variance success rate. Success rate is calculated by % and if cluster
+        has an average distance from middle under 500 points it's classified as a successful cluster
+        :param best_variance: selected best clusters
+        """
         good_clusters = 0
         for cluster in best_variance:
             center = self.center_calculation(cluster)
@@ -99,7 +155,12 @@ class DivisiveClustering:
         print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
         print(f"Cluster success rate {cluster_success_rate} %")
 
-    def run(self):
+    def run(self) -> None:
+        """
+        main method that implements divisive reverse k-means algorithm
+        it repeats cluster splitting until we have created wanted k clusters
+        at the end of method it also generates graphic plot for created clusters
+        """
         for i in range(DIVISIVE_ITERATIONS):
             self.current_num_of_clusters = 1
             current_clusters = self.clusters
