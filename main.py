@@ -1,5 +1,6 @@
 import argparse
 
+from algorithms.agglomerative_clustering import AgglomerativeClustering
 from algorithms.divisive_clustering import DivisiveClustering
 from algorithms.k_means import KMeans
 from helpers.consts import NUM_OF_POINTS
@@ -15,7 +16,7 @@ def main() -> None:
                     help="which algorithm to use (centroid k-means = c, medoid k-means = m, divisive = d)")
     ap.add_argument("-k", "--clusters", required=True, help="number of clusters (0 <x> points generated")
     args = vars(ap.parse_args())
-    if args["algorithm"] not in ['c', 'm', 'd']:
+    if args["algorithm"] not in ['c', 'm', 'd', 'a']:
         print("Select valid argument -a (centroid k-means = c, medoid k-means = m, divisive = d)")
         return
     try:
@@ -30,6 +31,8 @@ def main() -> None:
     created_points = Generator().generate_points()
     if args['algorithm'] == 'c' or args['algorithm'] == 'm':
         KMeans(created_points, int(args["clusters"]), args["algorithm"]).run()
+    elif args['algorithm'] == 'a':
+        AgglomerativeClustering(created_points, int(args["clusters"]), args["algorithm"]).run()
     else:
         DivisiveClustering(created_points, int(args["clusters"]), args["algorithm"]).run()
 

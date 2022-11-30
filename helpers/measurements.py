@@ -45,7 +45,7 @@ def get_dist_calculator(algorithm: str) -> centroid_calculation or medoid_calcul
     :param algorithm: m = medoid, c,d = centroid (d -means divisive algorithm)
     :return: function for center calculation
     """
-    if algorithm == "c" or algorithm == "d":
+    if algorithm == "c" or algorithm == "d" or algorithm == 'a':
         return centroid_calculation
     else:
         return medoid_calculation
