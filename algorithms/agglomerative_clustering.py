@@ -9,7 +9,9 @@ class AgglomerativeClustering:
     def __init__(self, clusters: List[List[int]], k_wanted_clusters: int, center_calculator: str) -> None:
         self.clusters = clusters
         self.k = k_wanted_clusters
-        self.distance_calculator = get_dist_calculator(center_calculator)
+        self.center_calculator = get_dist_calculator(center_calculator)
+        self.cluster_id = len(self.clusters)
+        self.cluster_centers_by_id = {}
 
     def _find_closest_clusters(self):
         smallest_distance = float("inf")
@@ -28,6 +30,7 @@ class AgglomerativeClustering:
         distance_list = []
 
         for i in range(len(self.clusters)):
+            self.cluster_centers_by_id[i] = self.clusters[i]
             cluster_list = []
             for j in range(len(self.clusters)):
                 if i == j:
@@ -36,13 +39,26 @@ class AgglomerativeClustering:
 
         self.heap = distance_list
 
-    def _remove_and_recalculate_points_from_heap(self, a, b):
+    def _remove_points_from_heap_and_dict(self, a, b):
         if a < b:
             del self.heap[b]
             del self.heap[a]
+            del self.clusters[b]
+            del self.clusters[a]
+            for i in range(len(self.clusters)):
+                del self.heap[i][b]
+                del self.heap[i][a]
         else:
             del self.heap[a]
             del self.heap[b]
+            del self.clusters[a]
+            del self.clusters[b]
+            for i in range(len(self.clusters)):
+                del self.heap[i][a]
+                del self.heap[i][b]
+        self.cluster_centers_by_id.pop(a)
+        self.cluster_centers_by_id.pop(b)
+        self.cluster_id -= 1
 
     def _process_new_cluster(self, new_cluster):
         new_distances = []
@@ -54,9 +70,18 @@ class AgglomerativeClustering:
     def _merge_closest_clusters(self, index):
         cluster1 = self.clusters[index[0]]
         cluster2 = self.clusters[index[0] + index[1]]
-        
-        new_cluster = Cluster(cluster1.points + cluster2.points, self.distance_calculator)
-        self._process_new_cluster(new_cluster)
+
+        new_cluster = cluster1 +cluster2
+        center_point = self.center_calculator(new_cluster)
+        self.cluster_centers_by_id[self.cluster_id] = new_cluster
+        self._recalculate_distances_in_heap(center_point)
+
+    def _recalculate_distances_in_heap(self,new_center):
+        for i in range(len(self.clusters)):
+            cluster_center = self.cluster_centers_by_id.get(i)
+            center_distances = distance(cluster_center,new_center)
+            self.heap[i].append(center_distances)
+            
 
     def run(self):
         self._create_distance_heap()
