@@ -110,7 +110,7 @@ class AgglomerativeClustering:
         self.cluster_centers_by_index[len(self.clusters)] = center_point
         self.clusters.append(new_cluster)
 
-    def _recalculate_distances_in_heap(self, new_center: List[int, int]) -> None:
+    def _recalculate_distances_in_heap(self, new_center: List[int]) -> None:
         """
         method that recalculates distances from newly created cluster center and adds them to distance heap
         :param new_center: newly created cluster center
@@ -161,10 +161,8 @@ class AgglomerativeClustering:
         self.stop_time = timeit.default_timer()
         self._statistics()
 
-        color_counter = 0
+
         for values in self.clusters:
-            if color_counter == len(COLORS):
-                color_counter = 0
-            plot.scatter([x[0] for x in values], [x[1] for x in values], color=COLORS[color_counter])
-            color_counter += 1
+            plot.scatter([x[0] for x in values], [x[1] for x in values])
+
         plot.show()

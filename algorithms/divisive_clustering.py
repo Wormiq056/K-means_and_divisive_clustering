@@ -184,10 +184,7 @@ class DivisiveClustering:
 
         self._statistics(best_variance)
 
-        color_counter = 0
+
         for values in best_variance:
-            if color_counter == len(COLORS):
-                color_counter = 0
-            plot.scatter([x[0] for x in values], [x[1] for x in values], color=COLORS[color_counter])
-            color_counter += 1
+            plot.scatter([x[0] for x in values], [x[1] for x in values])
         plot.show()

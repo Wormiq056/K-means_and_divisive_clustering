@@ -120,6 +120,18 @@ class KMeans:
             self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
             return self.final_clusters[max_success_rate_index]
 
+    def _console_print(self) -> None:
+        """
+        method that prints info to console
+        """
+        print(f"K-means clustering with {self.k} clusters")
+        if self.cluster_center == "m":
+            print(f"Center calculation: medoid")
+        else:
+            print(f"Center calculation: centroid")
+        print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
+        print(f"Cluster success rate {self.final_clusters_success_rate} %")
+
     def run(self) -> None:
         """
         main method of k-means algorithm, it contains the basic logic of k-means pseudo code and at the end it also
@@ -135,8 +147,7 @@ class KMeans:
         best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()
 
-        print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
-        print(f"Cluster success rate {self.final_clusters_success_rate} %")
+        self._console_print()
 
         color_counter = 0
         for values in best_variance.values():
