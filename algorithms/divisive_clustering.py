@@ -94,10 +94,7 @@ class DivisiveClustering:
         """
         if self.current_num_of_clusters == self.k:
             return
-        try:
-            chosen_points = self._choose_2_points_as_clusters(cluster)
-        except ValueError:
-            return
+        chosen_points = self._choose_2_points_as_clusters(cluster)
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         recalculated_center_points = self._calculate_new_center_points(assigned_points)
         reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
@@ -192,7 +189,10 @@ class DivisiveClustering:
             while self.current_num_of_clusters <= self.k:
                 new_clusters = []
                 for cluster in current_clusters:
-                    created_clusters = self._top_down_k_means(cluster)
+                    try:
+                        created_clusters = self._top_down_k_means(cluster)
+                    except ValueError:
+                        new_clusters.append(cluster)
                     if not created_clusters:
                         if len(current_clusters) != self.k:
                             self._handle_odd_k(current_clusters)
