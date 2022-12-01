@@ -1,5 +1,5 @@
-import timeit
 import random as rd
+import timeit
 from typing import List
 
 import matplotlib.pyplot as plot

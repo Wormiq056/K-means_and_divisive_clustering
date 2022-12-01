@@ -1,5 +1,5 @@
-import timeit
 import random as rd
+import timeit
 from typing import List
 
 from matplotlib import pyplot as plot
@@ -15,6 +15,7 @@ class KMeans:
     final_clusters = []
     start_time: float
     stop_time: float
+    final_clusters_success_rate: float
 
     def __init__(self, clusters: List[List[int]], num_of_clusters: int, cluster_center: str) -> None:
         """
@@ -26,6 +27,7 @@ class KMeans:
         self.k = num_of_clusters
         rd.seed(RANDOM_SEED)  # setting random seed fo reproducibility
         self.center_calculator = get_dist_calculator(cluster_center)
+        self.final_clusters_success_rate = 0
 
     def _assign_points_to_init_clusters(self, init_clusters: List[List[int]]) -> dict:
         """
@@ -76,9 +78,9 @@ class KMeans:
 
     def _select_best_variance(self) -> dict:
         """
-        method that selects best variance out of generated clusters, we repeat the whole k-means process n times (in my
-        case 5 times) and then based on variance we select the best one. Best variance means that generated k clusters
-        have the most evenly split number of points in all clusters
+        method that is called when cluster success rate is 0, it selects best variance out of generated clusters,
+        we repeat the whole k-means process n times  and then based on variance we select the best one. Best variance
+        means that generated k clusters have the most evenly split number of points in all clusters
         :return: best variance of k-means algorithm
         """
         variances = []
@@ -91,25 +93,32 @@ class KMeans:
         max_variance_index = variances.index(max(variances))
         return self.final_clusters[max_variance_index]
 
-    def _statistics(self, best_variance: dict) -> None:
+    def _select_best_cluster(self) -> dict:
         """
-        method that outputs statistics for generated outcome, how much time it took to generate n k-means algorithms and
-        select the best one. Also outputs selected variance success rate. Success rate is calculated by % and if cluster
-        has an average distance from middle under 500 points it's classified as a successful cluster
-        :param best_variance:
-        :return:
+        method that finds best clusters from generated clusters, cluster success rate is determined by calculating its
+        average distance from middle. It average distance is greater than 500 it is classified as unsuccessfully
+        otherwise it is successful
         """
-        good_clusters = 0
-        for cluster in best_variance.values():
-            center = self.center_calculator(cluster)
-            sum_of_distances = 0
-            for points in cluster:
-                sum_of_distances += distance(points, center)
-            if sum_of_distances / len(cluster) <= 500:
-                good_clusters += 1
-        cluster_success_rate = good_clusters / len(best_variance.values()) * 100
-        print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
-        print(f"Cluster success rate {cluster_success_rate} %")
+        success_rate_list = []
+        for clusters in self.final_clusters:
+            good_clusters = 0
+            for cluster in clusters.values():
+                center = self.center_calculator(cluster)
+                sum_of_distances = 0
+                for points in cluster:
+                    sum_of_distances += distance(points, center)
+                if sum_of_distances / len(cluster) <= 500:
+                    good_clusters += 1
+            cluster_success_rate = good_clusters / len(clusters) * 100
+            success_rate_list.append(cluster_success_rate)
+        max_success_rate_index = success_rate_list.index(max(success_rate_list))
+        if max_success_rate_index == 0:
+            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
+            return self._select_best_variance()
+
+        else:
+            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
+            return self.final_clusters[max_success_rate_index]
 
     def run(self) -> None:
         """
@@ -123,15 +132,16 @@ class KMeans:
             recalculated_clusters = self._assign_points_to_recalculated_centers(calculated_center_points)
             self.final_clusters.append(recalculated_clusters)
 
-        best_variance = self._select_best_variance()
+        best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()
 
-        self._statistics(best_variance)
+        print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
+        print(f"Cluster success rate {self.final_clusters_success_rate} %")
 
         color_counter = 0
         for values in best_variance.values():
             if color_counter == len(COLORS):
                 color_counter = 0
-            plot.scatter([x[0] for x in values], [x[1] for x in values], color=COLORS[color_counter])
+            plot.scatter([x[0] for x in values], [x[1] for x in values])
             color_counter += 1
         plot.show()
