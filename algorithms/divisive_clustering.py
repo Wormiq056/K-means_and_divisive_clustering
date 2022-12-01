@@ -4,7 +4,7 @@ from typing import List
 
 import matplotlib.pyplot as plot
 
-from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS, COLORS
+from helpers.consts import RANDOM_SEED, DIVISIVE_ITERATIONS
 from helpers.measurements import get_dist_calculator, distance
 
 
@@ -25,10 +25,12 @@ class DivisiveClustering:
         """
         self.start_time = timeit.default_timer()
         self.clusters = [created_points]
+        self.center_char = center_calculation
         self.k = num_of_clusters
         self.center_calculation = get_dist_calculator(center_calculation)
         rd.seed(RANDOM_SEED)  # setting seed for random for reproducibility
         self.current_num_of_clusters = 1
+        self.final_clusters_success_rate = 0
 
     @staticmethod
     def _choose_2_points_as_clusters(cluster: List[List[int]]) -> List[List[int]]:
@@ -92,7 +94,10 @@ class DivisiveClustering:
         """
         if self.current_num_of_clusters == self.k:
             return
-        chosen_points = self._choose_2_points_as_clusters(cluster)
+        try:
+            chosen_points = self._choose_2_points_as_clusters(cluster)
+        except ValueError:
+            return
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         recalculated_center_points = self._calculate_new_center_points(assigned_points)
         reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
@@ -136,24 +141,44 @@ class DivisiveClustering:
         max_variance_index = variances.index(max(variances))
         return self.final_clusters[max_variance_index]
 
-    def _statistics(self, best_variance: List[List[List[int]]]) -> None:
+    def _select_best_cluster(self) -> List[List[List[int]]]:
         """
-        method that outputs statistics for generated outcome, how much time it took to generate n k-means algorithms and
-        select the best one. Also outputs selected variance success rate. Success rate is calculated by % and if cluster
-        has an average distance from middle under 500 points it's classified as a successful cluster
-        :param best_variance: selected best clusters
+        method that finds best clusters from generated clusters, cluster success rate is determined by calculating its
+        average distance from middle. It average distance is greater than 500 it is classified as unsuccessfully
+        otherwise it is successful
         """
-        good_clusters = 0
-        for cluster in best_variance:
-            center = self.center_calculation(cluster)
-            sum_of_distances = 0
-            for points in cluster:
-                sum_of_distances += distance(points, center)
-            if sum_of_distances / len(cluster) <= 500:
-                good_clusters += 1
-        cluster_success_rate = good_clusters / len(best_variance) * 100
+        success_rate_list = []
+        for clusters in self.final_clusters:
+            good_clusters = 0
+            for cluster in clusters:
+                center = self.center_calculation(cluster)
+                sum_of_distances = 0
+                for points in cluster:
+                    sum_of_distances += distance(points, center)
+                if sum_of_distances / len(cluster) <= 500:
+                    good_clusters += 1
+            cluster_success_rate = good_clusters / len(clusters) * 100
+            success_rate_list.append(cluster_success_rate)
+        max_success_rate_index = success_rate_list.index(max(success_rate_list))
+        if max_success_rate_index == 0:
+            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
+            return self._select_best_variance()
+
+        else:
+            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
+            return self.final_clusters[max_success_rate_index]
+
+    def _console_print(self) -> None:
+        """
+        method that prints info to console
+        """
+        print(f"Divisive clustering with {self.k} clusters")
+        if self.center_char == "m":
+            print(f"Center calculation: medoid")
+        else:
+            print(f"Center calculation: centroid")
         print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
-        print(f"Cluster success rate {cluster_success_rate} %")
+        print(f"Cluster success rate {self.final_clusters_success_rate} %")
 
     def run(self) -> None:
         """
@@ -179,11 +204,10 @@ class DivisiveClustering:
                         new_clusters.append(created_cluster)
                 current_clusters = new_clusters
 
-        best_variance = self._select_best_variance()
+        best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()
 
-        self._statistics(best_variance)
-
+        self._console_print()
 
         for values in best_variance:
             plot.scatter([x[0] for x in values], [x[1] for x in values])

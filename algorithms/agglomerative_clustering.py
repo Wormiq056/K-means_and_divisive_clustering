@@ -3,7 +3,6 @@ from typing import List
 
 import matplotlib.pyplot as plot
 
-from helpers.consts import COLORS
 from helpers.measurements import distance, get_dist_calculator
 
 
@@ -160,7 +159,6 @@ class AgglomerativeClustering:
 
         self.stop_time = timeit.default_timer()
         self._statistics()
-
 
         for values in self.clusters:
             plot.scatter([x[0] for x in values], [x[1] for x in values])
