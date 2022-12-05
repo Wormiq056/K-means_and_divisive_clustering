@@ -28,7 +28,7 @@ class KMeans:
         rd.seed(RANDOM_SEED)  # setting random seed fo reproducibility
         self.center_calculator = get_dist_calculator(cluster_center)
         self.final_clusters_success_rate = 0
-        self.last_center_points = None
+        self.already_assigned_center_points = {}
 
     def _assign_points_to_init_clusters(self, init_clusters: List[List[int]]) -> dict:
         """
@@ -145,11 +145,12 @@ class KMeans:
             while True:
                 calculated_center_points = self._calculate_center_points(assigned_points)
                 assigned_points = self._assign_points_to_recalculated_centers(calculated_center_points)
-
-                if calculated_center_points == self.last_center_points:
+                if self.already_assigned_center_points.get(tuple(calculated_center_points)):
                     break
-                self.last_center_points = calculated_center_points
+                self.already_assigned_center_points[tuple(calculated_center_points)] = True
+
             self.final_clusters.append(assigned_points)
+            self.already_assigned_center_points.clear()
 
         best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()

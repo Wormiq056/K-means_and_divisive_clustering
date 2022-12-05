@@ -1,7 +1,7 @@
 """
 file that stores all needed constants for this program
 """
-RANDOM_SEED = "2514"
+RANDOM_SEED = "516546414"
 COORDINATES_START = -5000
 COORDINATES_END = 5000
 OFFSET_START = -100

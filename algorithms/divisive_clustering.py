@@ -39,6 +39,8 @@ class DivisiveClustering:
         :param cluster: from which we want to select random points
         :return: selected points
         """
+        if isinstance(cluster[0],int):
+            return cluster
         return rd.sample(cluster, 2)
 
 
@@ -196,10 +198,6 @@ class DivisiveClustering:
                         temp = cluster[1]
                     except Exception:
                         continue
-                    # if len(cluster) == 2:
-                    #     print(cluster)
-                    #     new_clusters.append(cluster)
-                    #     continue
                     created_clusters = self._top_down_k_means(cluster)
                     if not created_clusters:
                         if len(current_clusters) != self.k:
