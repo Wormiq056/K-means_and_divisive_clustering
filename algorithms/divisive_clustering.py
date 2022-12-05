@@ -30,19 +30,16 @@ class DivisiveClustering:
         self.center_calculation = get_dist_calculator(center_calculation)
         rd.seed(RANDOM_SEED)  # setting seed for random for reproducibility
         self.current_num_of_clusters = 1
-        self.final_clusters_success_rate = 0
+        self.final_cluster_success_rate = 0
 
     @staticmethod
-    def _choose_2_points_as_clusters(cluster: List[List[int]]) -> List[List[int]]:
+    def _choose_2_points_as_clusters(cluster: List[List[int]]) -> List[List[int]] or None:
         """
         static method that returns 2 randomly selected points from given cluster
         :param cluster: from which we want to select random points
         :return: selected points
         """
-        if isinstance(cluster[0],int):
-            return cluster
         return rd.sample(cluster, 2)
-
 
     @staticmethod
     def _assign_points_to_clusters(points: List[List[int]], cluster: List[List[int]]) -> dict:
@@ -52,6 +49,7 @@ class DivisiveClustering:
         :param cluster: from which we want to assign points to
         :return: dict with assigned points
         """
+
         cluster_dict = {tuple(point): [] for point in points}
         for value in cluster:
             distance_a = distance(points[0], value)
@@ -101,27 +99,8 @@ class DivisiveClustering:
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         recalculated_center_points = self._calculate_new_center_points(assigned_points)
         reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
+        self.current_num_of_clusters += 1
         return reassigned_points.values()
-
-    def _handle_odd_k(self, clusters: List[List[List[int]]]) -> None:
-        """
-        method that is called when wa want to have odd number of k clusters
-        it selects from current created cluster the one that has the biggest amount of values in it and splits them
-        into 2 following k-means reverse algorithm
-        at the end it stores created odd k clusters
-        :param clusters: so far generated clusters
-        """
-        cluster_lengths = [len(cluster) for cluster in clusters]
-        index = cluster_lengths.index(max(cluster_lengths))
-        chosen_points = self._choose_2_points_as_clusters(clusters[index])
-        assigned_points = self._assign_points_to_clusters(chosen_points, clusters[index])
-        recalculated_center_points = self._calculate_new_center_points(assigned_points)
-        reassigned_points = self._reassign_points_to_center(clusters[index], recalculated_center_points)
-        final_clusters = clusters
-        del final_clusters[index]
-        for cluster in reassigned_points.values():
-            final_clusters.append(cluster)
-        self.final_clusters.append(final_clusters)
 
     def _select_best_variance(self) -> List[List[List[int]]]:
         """
@@ -140,32 +119,21 @@ class DivisiveClustering:
         max_variance_index = variances.index(max(variances))
         return self.final_clusters[max_variance_index]
 
-    def _select_best_cluster(self) -> List[List[List[int]]]:
+    def _calculate_success_rate(self, best_variance: List[List[List[int]]]) -> None:
         """
-        method that finds best clusters from generated clusters, cluster success rate is determined by calculating its
-        average distance from middle. It average distance is greater than 500 it is classified as unsuccessfully
-        otherwise it is successful
+        method that calculates final cluster success rate for output, if average distance from cluster center is greater
+        than 5 that cluster is marked as unsuccessful
+        :param best_variance: final cluster
         """
-        success_rate_list = []
-        for clusters in self.final_clusters:
-            good_clusters = 0
-            for cluster in clusters:
-                center = self.center_calculation(cluster)
-                sum_of_distances = 0
-                for points in cluster:
-                    sum_of_distances += distance(points, center)
-                if sum_of_distances / len(cluster) <= 500:
-                    good_clusters += 1
-            cluster_success_rate = good_clusters / len(clusters) * 100
-            success_rate_list.append(cluster_success_rate)
-        max_success_rate_index = success_rate_list.index(max(success_rate_list))
-        if max_success_rate_index == 0:
-            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
-            return self._select_best_variance()
-
-        else:
-            self.final_clusters_success_rate = success_rate_list[max_success_rate_index]
-            return self.final_clusters[max_success_rate_index]
+        good_clusters = 0
+        for cluster in best_variance:
+            center = self.center_calculation(cluster)
+            sum_of_distances = 0
+            for points in cluster:
+                sum_of_distances += distance(points, center)
+            if sum_of_distances / len(cluster) <= 500:
+                good_clusters += 1
+        self.final_cluster_success_rate = good_clusters / len(best_variance) * 100
 
     def _console_print(self) -> None:
         """
@@ -177,7 +145,24 @@ class DivisiveClustering:
         else:
             print(f"Center calculation: centroid")
         print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
-        print(f"Cluster success rate {self.final_clusters_success_rate} %")
+        print(f"Cluster success rate {self.final_cluster_success_rate} %")
+
+    def _finish_iteration(self, old_clusters: List[List[int]], newly_created_clusters: List[List[int]], index: int) \
+            -> None:
+        """
+        method that is called at the end of one divisive k-means iteration, it creates one final cluster for old
+        clusters that have not been split yet and new clusters that have been already split
+        :param old_clusters: one loop before splitting
+        :param newly_created_clusters: clusters that have been already split
+        :param index: at what index in old clusters did algorithm stop
+        """
+        final_clusters = []
+        for i in range(index, len(old_clusters), 1):
+            final_clusters.append(old_clusters[i])
+        for cluster in newly_created_clusters:
+            final_clusters.append(cluster)
+        self.final_clusters.append(final_clusters)
+        self.current_num_of_clusters = self.k + 1
 
     def run(self) -> None:
         """
@@ -190,29 +175,20 @@ class DivisiveClustering:
             current_clusters = self.clusters
             while self.current_num_of_clusters <= self.k:
                 new_clusters = []
+                counter = 0
                 for cluster in current_clusters:
-                    if isinstance(cluster[0], int):
-                        new_clusters.append(cluster)
-                        continue
-                    try:
-                        temp = cluster[1]
-                    except Exception:
-                        continue
                     created_clusters = self._top_down_k_means(cluster)
                     if not created_clusters:
-                        if len(current_clusters) != self.k:
-                            self._handle_odd_k(current_clusters)
-                        else:
-                            self.final_clusters.append(current_clusters)
-                        self.current_num_of_clusters += 1
+                        self._finish_iteration(current_clusters, new_clusters, counter)
                         break
                     for created_cluster in created_clusters:
                         new_clusters.append(created_cluster)
+                    counter += 1
                 current_clusters = new_clusters
 
-        best_variance = self._select_best_cluster()
+        best_variance = self._select_best_variance()
+        self._calculate_success_rate(best_variance)
         self.stop_time = timeit.default_timer()
-        print(len(best_variance))
         self._console_print()
 
         for values in best_variance:
