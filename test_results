@@ -1,0 +1,136 @@
+K-means clustering with 3 clusters
+Center calculation: centroid
+Time to calculate clusters : 2.6108841999666765 seconds
+Cluster success rate 0.0 %
+
+K-means clustering with 3 clusters
+Center calculation: medoid
+Time to calculate clusters : 6.4086240999167785 seconds
+Cluster success rate 0.0 %
+
+Divisive clustering with 3 clusters
+Center calculation: centroid
+Time to calculate clusters : 4.548439500038512 seconds
+Cluster success rate 0.0 %
+
+K-means clustering with 5 clusters
+Center calculation: centroid
+Time to calculate clusters : 4.7726375999627635 seconds
+Cluster success rate 40.0 %
+
+
+K-means clustering with 5 clusters
+Center calculation: medoid
+Time to calculate clusters : 7.22083190002013 seconds
+Cluster success rate 0.0 %
+
+Divisive clustering with 5 clusters
+Center calculation: centroid
+Time to calculate clusters : 2.76444379996974 seconds
+Cluster success rate 20.0 %
+
+K-means clustering with 7 clusters
+Center calculation: centroid
+Time to calculate clusters : 5.553368200082332 seconds
+Cluster success rate 42.857142857142854 %
+
+K-means clustering with 7 clusters
+Center calculation: medoid
+Time to calculate clusters : 8.326435000053607 seconds
+Cluster success rate 14.285714285714285 %
+
+Divisive clustering with 7 clusters
+Center calculation: centroid
+Time to calculate clusters : 5.333091299980879 seconds
+Cluster success rate 28.57142857142857 %
+
+K-means clustering with 11 clusters
+Center calculation: centroid
+Time to calculate clusters : 13.488844800041988 seconds
+Cluster success rate 72.72727272727273 %
+
+K-means clustering with 11 clusters
+Center calculation: medoid
+Time to calculate clusters : 12.71863040002063 seconds
+Cluster success rate 27.27272727272727 %
+
+Divisive clustering with 11 clusters
+Center calculation: centroid
+Time to calculate clusters : 4.763263799948618 seconds
+Cluster success rate 63.63636363636363 %
+
+K-means clustering with 15 clusters
+Center calculation: centroid
+Time to calculate clusters : 23.954176499973983 seconds
+Cluster success rate 93.33333333333333 %
+
+K-means clustering with 15 clusters
+Center calculation: medoid
+Time to calculate clusters : 18.481619899976067 seconds
+Cluster success rate 26.666666666666668 %
+
+Divisive clustering with 15 clusters
+Center calculation: centroid
+Time to calculate clusters : 5.561897100065835 seconds
+Cluster success rate 93.33333333333333 %
+
+Agglomerative clustering with 3 clusters
+Center calculation: centroid
+Time to calculate clusters : 7.0471438999520615 seconds
+Cluster success rate 33.33333333333333 %
+
+Agglomerative clustering with 5 clusters
+Center calculation: centroid
+Time to calculate clusters : 6.187258100020699 seconds
+Cluster success rate 20.0 %
+
+Agglomerative clustering with 7 clusters
+Center calculation: centroid
+Time to calculate clusters : 7.139422300038859 seconds
+Cluster success rate 42.857142857142854 %
+
+Agglomerative clustering with 9 clusters
+Center calculation: centroid
+Time to calculate clusters : 6.491156200063415 seconds
+Cluster success rate 66.66666666666666 %
+
+Agglomerative clustering with 11 clusters
+Center calculation: centroid
+Time to calculate clusters : 6.599643399938941 seconds
+Cluster success rate 81.81818181818183 %
+
+Agglomerative clustering with 15 clusters
+Center calculation: centroid
+Time to calculate clusters : 6.324070799979381 seconds
+Cluster success rate 93.33333333333333 %
+
+
+Agglomerative clustering with 3 clusters
+Center calculation: centroid
+Time to calculate clusters : 64.46626729995478 seconds
+Cluster success rate 33.33333333333333 %
+
+Agglomerative clustering with 5 clusters
+Center calculation: centroid
+Time to calculate clusters : 64.58440980000887 seconds
+Cluster success rate 20.0 %
+
+Agglomerative clustering with 7 clusters
+Center calculation: centroid
+Time to calculate clusters : 66.96012679999694 seconds
+Cluster success rate 42.857142857142854 %
+
+Agglomerative clustering with 9 clusters
+Center calculation: centroid
+Time to calculate clusters : 63.70392949995585 seconds
+Cluster success rate 66.66666666666666 %
+
+Agglomerative clustering with 11 clusters
+Center calculation: centroid
+Time to calculate clusters : 63.5052717999788 seconds
+Cluster success rate 81.81818181818183 %
+
+Agglomerative clustering with 15 clusters
+Center calculation: centroid
+Time to calculate clusters : 63.392995100002736 seconds
+Cluster success rate 93.33333333333333 %

@@ -144,6 +144,8 @@ class AgglomerativeClustering:
             if sum_of_distances / len(cluster) <= 500:
                 good_clusters += 1
         cluster_success_rate = good_clusters / len(self.clusters) * 100
+        print(f"Agglomerative clustering with {self.k} clusters")
+        print("Center calculation: centroid")
         print(f"Time to calculate clusters : {self.stop_time - self.start_time} seconds")
         print(f"Cluster success rate {cluster_success_rate} %")
 
@@ -155,7 +157,6 @@ class AgglomerativeClustering:
         while len(self.clusters) != self.k:
             index = self._find_closest_clusters()
             self._merge_closest_clusters(index)
-            print(len(self.heap))
 
         self.stop_time = timeit.default_timer()
         self._statistics()

@@ -96,7 +96,6 @@ class DivisiveClustering:
         created_center_points = {}
         if self.current_num_of_clusters == self.k:
             return
-
         chosen_points = self._choose_2_points_as_clusters(cluster)
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         while True:
@@ -105,7 +104,6 @@ class DivisiveClustering:
             if created_center_points.get(tuple(recalculated_center_points)):
                 break
             created_center_points[tuple(recalculated_center_points)] = True
-
         self.current_num_of_clusters += 1
         return assigned_points.values()
 
