@@ -93,14 +93,21 @@ class DivisiveClustering:
         :param cluster: cluster we want to split
         :return: list of 2 new clusters
         """
+        created_center_points = {}
         if self.current_num_of_clusters == self.k:
             return
+
         chosen_points = self._choose_2_points_as_clusters(cluster)
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
-        recalculated_center_points = self._calculate_new_center_points(assigned_points)
-        reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
+        while True:
+            recalculated_center_points = self._calculate_new_center_points(assigned_points)
+            assigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
+            if created_center_points.get(tuple(recalculated_center_points)):
+                break
+            created_center_points[tuple(recalculated_center_points)] = True
+
         self.current_num_of_clusters += 1
-        return reassigned_points.values()
+        return assigned_points.values()
 
     def _select_best_variance(self) -> List[List[List[int]]]:
         """
