@@ -41,6 +41,7 @@ class DivisiveClustering:
         """
         return rd.sample(cluster, 2)
 
+
     @staticmethod
     def _assign_points_to_clusters(points: List[List[int]], cluster: List[List[int]]) -> dict:
         """
@@ -98,7 +99,6 @@ class DivisiveClustering:
         assigned_points = self._assign_points_to_clusters(chosen_points, cluster)
         recalculated_center_points = self._calculate_new_center_points(assigned_points)
         reassigned_points = self._reassign_points_to_center(cluster, recalculated_center_points)
-        self.current_num_of_clusters += 1
         return reassigned_points.values()
 
     def _handle_odd_k(self, clusters: List[List[List[int]]]) -> None:
@@ -189,10 +189,18 @@ class DivisiveClustering:
             while self.current_num_of_clusters <= self.k:
                 new_clusters = []
                 for cluster in current_clusters:
-                    try:
-                        created_clusters = self._top_down_k_means(cluster)
-                    except ValueError:
+                    if isinstance(cluster[0], int):
                         new_clusters.append(cluster)
+                        continue
+                    try:
+                        temp = cluster[1]
+                    except Exception:
+                        continue
+                    # if len(cluster) == 2:
+                    #     print(cluster)
+                    #     new_clusters.append(cluster)
+                    #     continue
+                    created_clusters = self._top_down_k_means(cluster)
                     if not created_clusters:
                         if len(current_clusters) != self.k:
                             self._handle_odd_k(current_clusters)
@@ -206,7 +214,7 @@ class DivisiveClustering:
 
         best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()
-
+        print(len(best_variance))
         self._console_print()
 
         for values in best_variance:

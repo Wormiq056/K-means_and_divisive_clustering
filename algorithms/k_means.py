@@ -28,6 +28,7 @@ class KMeans:
         rd.seed(RANDOM_SEED)  # setting random seed fo reproducibility
         self.center_calculator = get_dist_calculator(cluster_center)
         self.final_clusters_success_rate = 0
+        self.last_center_points = None
 
     def _assign_points_to_init_clusters(self, init_clusters: List[List[int]]) -> dict:
         """
@@ -137,12 +138,18 @@ class KMeans:
         main method of k-means algorithm, it contains the basic logic of k-means pseudo code and at the end it also
         generates graphic plot for best selected k-means iteration
         """
+
         for i in range(K_MEANS_ITERATIONS):
             init_clusters = self._choose_init_clusters()
             assigned_points = self._assign_points_to_init_clusters(init_clusters)
-            calculated_center_points = self._calculate_center_points(assigned_points)
-            recalculated_clusters = self._assign_points_to_recalculated_centers(calculated_center_points)
-            self.final_clusters.append(recalculated_clusters)
+            while True:
+                calculated_center_points = self._calculate_center_points(assigned_points)
+                assigned_points = self._assign_points_to_recalculated_centers(calculated_center_points)
+
+                if calculated_center_points == self.last_center_points:
+                    break
+                self.last_center_points = calculated_center_points
+            self.final_clusters.append(assigned_points)
 
         best_variance = self._select_best_cluster()
         self.stop_time = timeit.default_timer()
